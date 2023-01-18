@@ -129,9 +129,9 @@ class KPI_Processing():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_path', type=str, default='SMD/train')
-    parser.add_argument('--test_path', type=str, default='SMD/test')
-    parser.add_argument('--label_path', type=str, default='SMD/test_label')
+    parser.add_argument('--train_path', type=str, default='../../datasets/ServerMachineDataset/train')
+    parser.add_argument('--test_path', type=str, default='../../datasets/ServerMachineDataset/test')
+    parser.add_argument('--label_path', type=str, default='../../datasets/ServerMachineDataset/test_label')
     parser.add_argument('--output_path', type=str, default='SMD_processed_1st')
     parser.add_argument('--dataset', type=str, default='SMD')
     args = parser.parse_args()

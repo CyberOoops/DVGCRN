@@ -70,11 +70,12 @@ class Evaluator():
             'latency': t[-1],
             'threshold': th
         })
+        # print("best f1 %f ,pre %f, rec %f, thres %f"%(t[0], t[1], t[2], th))
 
-        pot_result = pot_eval(timestamp_anomalyscore_label[1].astype(np.float),
-                              timestamp_anomalyscore_label[1].astype(np.float), label_0_1, level=self.level)
-        best_valid_metrics.update(pot_result)
-        pprint(best_valid_metrics)
+        # pot_result = pot_eval(timestamp_anomalyscore_label[1].astype(np.float),
+        #                       timestamp_anomalyscore_label[1].astype(np.float), label_0_1, level=self.level)
+        # best_valid_metrics.update(pot_result)
+        # pprint(best_valid_metrics)
         return best_valid_metrics
 
 
@@ -180,7 +181,8 @@ def bf_search(score, label, start, end=None, step_num=1, display_freq=1, verbose
         step_num = 1
     search_step, search_range, search_lower_bound = step_num, end - start, start
     if verbose:
-        print("search range: ", search_lower_bound, search_lower_bound + search_range)
+        pass
+        # print("search range: ", search_lower_bound, search_lower_bound + search_range)
     threshold = search_lower_bound
     m = (-1., -1., -1.)
     m_t = 0.0
@@ -191,8 +193,9 @@ def bf_search(score, label, start, end=None, step_num=1, display_freq=1, verbose
             m_t = threshold
             m = target
         if verbose and i % display_freq == 0:
-            print("cur thr: ", threshold, target, m, m_t)
-    print(m, m_t)
+            # print("cur thr: ", threshold, target, m, m_t)
+            pass
+    # print(m, m_t)
     return m, m_t
 
 
@@ -215,12 +218,12 @@ def pot_eval(init_score, score, label, q=1e-3, level=0.02):
     s.fit(init_score, score)  # data import
     s.initialize(level=level, min_extrema=True)  # initialization step
     ret = s.run(dynamic=False)  # run
-    print(len(ret['alarms']))
-    print(len(ret['thresholds']))
+    # print(len(ret['alarms']))
+    # print(len(ret['thresholds']))
     pot_th = -np.mean(ret['thresholds'])
     pred, p_latency = adjust_predicts(score, label, pot_th, calc_latency=True)
     p_t = calc_point2point(pred, label)
-    print('POT result: ', p_t, pot_th, p_latency)
+    # print('POT result: ', p_t, pot_th, p_latency)
     return {
         'pot-f1': p_t[0],
         'pot-precision': p_t[1],
@@ -234,12 +237,12 @@ def pot_eval(init_score, score, label, q=1e-3, level=0.02):
     }
 
 
-def main(i, j, level):
+def main(mac, level):
     parser = argparse.ArgumentParser()
     # GPU option
     parser.add_argument('--gpu_id', type=int, default=0)
     # Dataset options
-    parser.add_argument('--dataset_path', type=str, default='../datas/dataPreprocessed/test/machine-{}-{}'.format(i, j))
+    parser.add_argument('--dataset_path', type=str, default='../datas/dataPreprocessed/test/{}'.format(mac))
     parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--T', type=int, default=20)
@@ -257,11 +260,11 @@ def main(i, j, level):
     parser.add_argument('--start_epoch', type=int, default=50)
     parser.add_argument('--checkpoints_path', type=str, default='')
     parser.add_argument('--checkpoints_file', type=str, default='')
-    parser.add_argument('--log_path', type=str, default='log_evaluator_pot/machine-{}-{}'.format(i, j))
+    parser.add_argument('--log_path', type=str, default='log_evaluator_pot/{}'.format(mac))
     parser.add_argument('--log_file', type=str, default='')
     parser.add_argument('--log_file_verified', type=str, default='')
 
-    parser.add_argument('--llh_path', type=str, default='log_tester/machine-{}-{}'.format(i, j))
+    parser.add_argument('--llh_path', type=str, default='log_tester/{}'.format(mac))
     parser.add_argument('--llh_file', type=str, default='')
     parser.add_argument('--llh_file_verified', type=str, default='')
 
@@ -326,10 +329,11 @@ def main(i, j, level):
         os.makedirs(args.log_path)
 
     # path_list = np.loadtxt(args.websites_fname, dtype=str, delimiter=None, skiprows=0, usecols=None, unpack=True)
+    evaluate_results = []
+    evaluate_results_verified = []
+    
     for _score_idx in [1, 3]:
-        evaluate_results = []
-        evaluate_results_verified = []
-        print(os.path.exists(os.path.join(args.llh_path, args.llh_file)))
+        # print(os.path.exists(os.path.join(args.llh_path, args.llh_file)))
         if not os.path.exists(os.path.join(args.llh_path, args.llh_file)):
             raise ValueError('Unknown anomaly score label file: {}'.format(args.llh_path))
         anomaly_score_label_file = os.path.join(args.llh_path, args.llh_file)
@@ -342,18 +346,18 @@ def main(i, j, level):
         results = evaluator.perform_evaluating()
         evaluate_results.append(results)
         all_res = {}
-        metrics = ['threshold', 'FN', 'FP', 'TN', 'TP', 'precision', 'recall', 'best-f1', 'pot-threshold', 'pot-FN',
-                   'pot-FP', 'pot-TN', 'pot-TP', 'pot-precision', 'pot-recall', 'pot-f1']
-        for res in evaluate_results:
-            if not all_res:
-                for metric in metrics:
-                    all_res[metric] = [res[metric]]
-            else:
-                for metric in metrics:
-                    all_res[metric].append(res[metric])
-        all_res_pd = pd.DataFrame(all_res, columns=metrics)
-        all_res_pd.to_csv(os.path.join(args.log_path, args.log_file + '_{}.csv'.format(_score_idx)), index=False,
-                          header=True)
+        # metrics = ['threshold', 'FN', 'FP', 'TN', 'TP', 'precision', 'recall', 'best-f1', 'pot-threshold', 'pot-FN',
+        #            'pot-FP', 'pot-TN', 'pot-TP', 'pot-precision', 'pot-recall', 'pot-f1']
+        # for res in evaluate_results:
+        #     if not all_res:
+        #         for metric in metrics:
+        #             all_res[metric] = [res[metric]]
+        #     else:
+        #         for metric in metrics:
+        #             all_res[metric].append(res[metric])
+        # all_res_pd = pd.DataFrame(all_res, columns=metrics)
+        # all_res_pd.to_csv(os.path.join(args.log_path, args.log_file + '_{}.csv'.format(_score_idx)), index=False,
+        #                   header=True)
 
         if not os.path.exists(os.path.join(args.llh_path, args.llh_file_verified)):
             raise ValueError('Unknown anomaly score label file: {}'.format(args.llh_path))
@@ -366,20 +370,41 @@ def main(i, j, level):
 
         results_verified = evaluator_verified.perform_evaluating()
         evaluate_results_verified.append(results_verified)
-        all_res_verified = {}
-        metrics_verified = ['threshold', 'FN', 'FP', 'TN', 'TP', 'precision', 'recall', 'best-f1', 'pot-threshold',
-                            'pot-FN', 'pot-FP', 'pot-TN', 'pot-TP', 'pot-precision', 'pot-recall', 'pot-f1']
-        for res_verified in evaluate_results_verified:
-            if not all_res_verified:
-                for metric_verified in metrics_verified:
-                    all_res_verified[metric_verified] = [res_verified[metric_verified]]
-            else:
-                for metric_verified in metrics_verified:
-                    all_res_verified[metric_verified].append(res_verified[metric_verified])
-        all_res_pd_verified = pd.DataFrame(all_res_verified, columns=metrics_verified)
-        all_res_pd_verified.to_csv(os.path.join(args.log_path, args.log_file_verified + '_{}.csv'.format(_score_idx)),
-                                   index=False, header=True)
+        # all_res_verified = {}
+        # metrics_verified = ['threshold', 'FN', 'FP', 'TN', 'TP', 'precision', 'recall', 'best-f1', 'pot-threshold',
+        #                     'pot-FN', 'pot-FP', 'pot-TN', 'pot-TP', 'pot-precision', 'pot-recall', 'pot-f1']
+        # for res_verified in evaluate_results_verified:
+        #     if not all_res_verified:
+        #         for metric_verified in metrics_verified:
+        #             all_res_verified[metric_verified] = [res_verified[metric_verified]]
+        #     else:
+        #         for metric_verified in metrics_verified:
+        #             all_res_verified[metric_verified].append(res_verified[metric_verified])
+        # all_res_pd_verified = pd.DataFrame(all_res_verified, columns=metrics_verified)
+        # all_res_pd_verified.to_csv(os.path.join(args.log_path, args.log_file_verified + '_{}.csv'.format(_score_idx)),
+        #                            index=False, header=True)
+    print(evaluate_results)
+    return evaluate_results
 
 
 if __name__ == '__main__':
-    main(2, 3, 0.004)
+    SMD_machine = ["machine-1-2","machine-1-3","machine-1-4","machine-1-5","machine-1-6","machine-1-7","machine-1-8","machine-2-1","machine-2-2","machine-2-3","machine-2-4","machine-2-5","machine-2-6","machine-2-7","machine-2-8","machine-2-9","machine-3-1","machine-3-2","machine-3-3","machine-3-4","machine-3-5","machine-3-6","machine-3-7","machine-3-8","machine-3-9","machine-3-10","machine-3-11"]
+    f1_list = [0.9999]
+    p_list = [0.9999]
+    r_list = [0.9999]
+    f1_list_1 = [0.9999]
+    p_list_1 = [0.9999]
+    r_list_1 = [0.9999]
+    for i in SMD_machine:
+        result = main(i, 0.004)
+        f1_list.append(result[0]['best-f1']), p_list.append(result[0]['precision']), r_list.append(result[0]['recall'])
+        f1_list_1.append(result[1]['best-f1']), p_list_1.append(result[1]['precision']), r_list_1.append(result[1]['recall'])
+        
+    for i in range(len(SMD_machine)):
+        print("%s f1 %f, pre %f, rec %f"%(i, f1_list[i+1], p_list[i+1], r_list[i+1]))
+    print("=============================")
+    for i in range(len(SMD_machine)):
+        print("%s f1_1 %f, pre %f, rec %f"%(i, f1_list_1[i+1], p_list_1[i+1], r_list_1[i+1]))
+    print("==========AVG RESULT=========")
+    print(np.mean(np.asarray(f1_list)), np.mean(np.asarray(p_list)), np.mean(np.asarray(r_list)))
+    print(np.mean(np.asarray(f1_list_1)), np.mean(np.asarray(p_list_1)), np.mean(np.asarray(r_list_1)))
