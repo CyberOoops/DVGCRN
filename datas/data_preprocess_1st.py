@@ -24,7 +24,7 @@ class KPI_Processing():
             raise ValueError('Unknown kpi datasets path: {}'.format(label_path))
         if not os.path.exists(output_path):
             os.makedirs(output_path)
-        if dataset == 'SMD':
+        if dataset == 'SMD' or dataset == 'swat' or dataset == 'wadi':
             dataset_name = 'machine'
         else:
             raise ValueError('Unknown dataset: {}'.format(dataset))
@@ -137,8 +137,12 @@ def main():
     args = parser.parse_args()
 
     kpi_processing = KPI_Processing('./')
-    kpi_processing.kpi_concat(args.train_path, args.test_path, 
-                              args.label_path, args.output_path, args.dataset)
+    train_path = "../../datasets/%s/train"%args.dataset 
+    test_path = '../../datasets/%s/test'%args.dataset 
+    label_path = '../../datasets/%s/test_label'%args.dataset 
+    output_path = '%s_processed_1st'%args.dataset 
+    kpi_processing.kpi_concat(train_path, test_path, 
+                              label_path, output_path, args.dataset)
 
 
 if __name__ == '__main__':
