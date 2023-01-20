@@ -190,7 +190,8 @@ def main(i, j):
     # GPU
     parser.add_argument('--gpu_id', type=int, default=0)
     # Dataset
-    parser.add_argument('--dataset_path', type=str, default='../datas/data_processed/test/machine-{}-{}'.format(i, j))
+    parser.add_argument('--dataset', type=str)
+    # parser.add_argument('--dataset_path', type=str, default='../datas/data_processed/test/machine-{}-{}'.format(i, j))
     parser.add_argument('--batch_size', type=int, default=1)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--T', type=int, default=20)
@@ -204,14 +205,19 @@ def main(i, j):
     parser.add_argument('--emb_dim', type=int, default=256)
     # Test
     parser.add_argument('--start_epoch', type=int, default=50)
-    parser.add_argument('--checkpoints_path', type=str, default='model/machine-{}-{}'.format(i, j))
+    # parser.add_argument('--checkpoints_path', type=str, default='model/machine-{}-{}'.format(i, j))
     parser.add_argument('--checkpoints_file', type=str, default='')
     parser.add_argument('--checkpoints_interval', type=int, default=5)
-    parser.add_argument('--log_path', type=str, default='log_tester/machine-{}-{}'.format(i, j))
+    # parser.add_argument('--log_path', type=str, default='log_tester/machine-{}-{}'.format(i, j))
     parser.add_argument('--log_file', type=str, default='')
     parser.add_argument('--nsamples', type=int, default=1)
     parser.add_argument('--sample_path', type=str, default='gen_samples')
     args = parser.parse_args()
+    
+    dataset_path = '../datas/{}data_processed/train/machine-{}-{}'.format(args.dataset, i, j)
+    log_path = 'log_trainer/%s'%args.dataset
+    checkpoints_path = 'model/%s'%args.dataset
+    
     assert len(args.z_dims) == len(args.h_dims)
     # Set up GPU
     if torch.cuda.is_available() and args.gpu_id >= 0:
@@ -219,12 +225,12 @@ def main(i, j):
     else:
         device = torch.device('cpu')
     # Set up paths
-    if not os.path.exists(args.dataset_path):
-        raise ValueError('Unknown dataset path: {}'.format(args.dataset_path))
-    if not os.path.exists(args.log_path):
-        os.makedirs(args.log_path)
-    if not os.path.exists(args.checkpoints_path):
-        os.makedirs(args.checkpoints_path)
+    if not os.path.exists(dataset_path):
+        raise ValueError('Unknown dataset path: {}'.format(dataset_path))
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    if not os.path.exists(checkpoints_path):
+        os.makedirs(checkpoints_path)
     z_dim_info = ''
     h_dim_info = ''
     for i in range(len(args.z_dims)):
@@ -253,7 +259,7 @@ def main(i, j):
             args.l
         )
     # Dataloader
-    kpi_value_test = KpiReader(args.dataset_path)
+    kpi_value_test = KpiReader(dataset_path)
     test_loader = data.DataLoader(kpi_value_test,
                                   batch_size=args.batch_size,
                                   shuffle=False,
@@ -269,11 +275,11 @@ def main(i, j):
                                         device=device
                                         )
     tester = Tester(graphstackedvrnn, device, kpi_value_test, test_loader,
-                    log_path=args.log_path,
+                    log_path=log_path,
                     log_file=args.log_file,
                     nsamples=args.nsamples,
                     sample_path=args.sample_path,
-                    checkpoints=os.path.join(args.checkpoints_path, args.checkpoints_file))
+                    checkpoints=os.path.join(checkpoints_path, args.checkpoints_file))
     tester.load_checkpoint(args.start_epoch)
     tester.model_test()
     tester.logger.anomaly_score_plot_llh_x(y_range=[-50, 10])
@@ -292,8 +298,9 @@ def main(i, j):
 if __name__ == '__main__':
     import warnings
     warnings.filterwarnings('ignore')
-    x = [[1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8],
-         [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [2, 9],
-         [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [3, 11]]
+    x = [[1, 1]]
+    # x = [[1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8],
+    #      [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [2, 9],
+    #      [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [3, 11]]
     for item in x:
         main(item[0], item[1])

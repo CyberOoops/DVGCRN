@@ -175,12 +175,12 @@ def main(i, j):
     else:
         device = torch.device('cpu')
     # Set up paths
-    if not os.path.exists(args.dataset_path):
-        raise ValueError('Unknown dataset path: {}'.format(args.dataset_path))
-    if not os.path.exists(args.log_path):
-        os.makedirs(args.log_path)
-    if not os.path.exists(args.checkpoints_path):
-        os.makedirs(args.checkpoints_path)
+    if not os.path.exists(dataset_path):
+        raise ValueError('Unknown dataset path: {}'.format(dataset_path))
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    if not os.path.exists(checkpoints_path):
+        os.makedirs(checkpoints_path)
     z_dim_info = ''
     h_dim_info = ''
     for i in range(len(args.z_dims)):
@@ -209,7 +209,7 @@ def main(i, j):
             args.l
         )
     # Dataloader
-    kpi_value_train = KpiReader(args.dataset_path)
+    kpi_value_train = KpiReader(dataset_path)
     train_loader = data.DataLoader(kpi_value_train,
                                    batch_size=args.batch_size,
                                    shuffle=True,
@@ -228,12 +228,12 @@ def main(i, j):
                                         device=device
                                         )
     trainer = Trainer(graphstackedvrnn, kpi_value_train, train_loader,
-                      log_path=args.log_path,
+                      log_path=log_path,
                       log_file=args.log_file,
                       batch_size=args.batch_size,
                       epochs=args.epochs,
                       learning_rate=args.learning_rate,
-                      checkpoints=os.path.join(args.checkpoints_path, args.checkpoints_file),
+                      checkpoints=os.path.join(checkpoints_path, args.checkpoints_file),
                       checkpoints_interval=args.checkpoints_interval, device=device)
     trainer.load_checkpoint(args.start_epoch)
     trainer.train_model()
