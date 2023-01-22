@@ -154,7 +154,7 @@ def main(i, j):
     parser.add_argument('--beta', type=float, default=0.0)
     parser.add_argument('--max_beta', type=float, default=1.0)
     parser.add_argument('--anneal_rate', type=float, default=0.05)
-    parser.add_argument('--epochs', type=int, default=60)
+    parser.add_argument('--epochs', type=int, default=160)
     parser.add_argument('--start_epoch', type=int, default=50)
     # parser.add_argument('--checkpoints_path', type=str, default='model/machine-{}-{}'.format(i, j))
     parser.add_argument('--checkpoints_file', type=str, default='')
@@ -212,8 +212,8 @@ def main(i, j):
     kpi_value_train = KpiReader(dataset_path)
     train_loader = data.DataLoader(kpi_value_train,
                                    batch_size=args.batch_size,
-                                   shuffle=True,
-                                   num_workers=args.num_workers)
+                                   shuffle=True)
+                                   # num_workers=args.num_workers)
     graphstackedvrnn = GraphStackedVRNN(x_dim=args.n,
                                         z_dim=args.z_dims,
                                         h_dim=args.h_dims,

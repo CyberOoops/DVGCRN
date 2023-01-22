@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class Evaluator():
-    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-100, bf_search_max=10,
+    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-180, bf_search_max=10,
                  bf_search_step_size=0.2, level=0.0030, log_path='', log_file=''):
         self.anomaly_score_label_file = anomaly_score_label_file
         self.score_idx = score_idx
@@ -242,7 +242,7 @@ def main(mac, level):
     # GPU option
     parser.add_argument('--gpu_id', type=int, default=0)
     # Dataset options
-    parser.add_argument('--dataset_path', type=str, default='../datas/dataPreprocessed/test/{}'.format(mac))
+    parser.add_argument('--dataset', type=str)
     parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--T', type=int, default=20)
@@ -269,11 +269,12 @@ def main(mac, level):
     parser.add_argument('--llh_file_verified', type=str, default='')
 
     parser.add_argument('--level', type=float, default=level)
-    parser.add_argument('--bf_search_min', type=float, default=-100.0)
+    parser.add_argument('--bf_search_min', type=float, default=-180.0)
     parser.add_argument('--bf_search_max', type=float, default=10.0)
     parser.add_argument('--bf_search_step_size', type=float, default=0.2)
 
     args = parser.parse_args()
+    
     assert (len(args.z_dims) == len(args.h_dims))
 
     z_dim_info = ''
@@ -388,23 +389,26 @@ def main(mac, level):
 
 
 if __name__ == '__main__':
-    SMD_machine = ["machine-1-2","machine-1-3","machine-1-4","machine-1-5","machine-1-6","machine-1-7","machine-1-8","machine-2-1","machine-2-2","machine-2-3","machine-2-4","machine-2-5","machine-2-6","machine-2-7","machine-2-8","machine-2-9","machine-3-1","machine-3-2","machine-3-3","machine-3-4","machine-3-5","machine-3-6","machine-3-7","machine-3-8","machine-3-9","machine-3-10","machine-3-11"]
-    f1_list = [0.9999]
-    p_list = [0.9999]
-    r_list = [0.9999]
-    f1_list_1 = [0.9999]
-    p_list_1 = [0.9999]
-    r_list_1 = [0.9999]
-    for i in SMD_machine:
-        result = main(i, 0.004)
-        f1_list.append(result[0]['best-f1']), p_list.append(result[0]['precision']), r_list.append(result[0]['recall'])
-        f1_list_1.append(result[1]['best-f1']), p_list_1.append(result[1]['precision']), r_list_1.append(result[1]['recall'])
+    result = main("swat", 0.004)
+    for i in result:
+        pprint(i)
+    # SMD_machine = ["machine-1-2","machine-1-3","machine-1-4","machine-1-5","machine-1-6","machine-1-7","machine-1-8","machine-2-1","machine-2-2","machine-2-3","machine-2-4","machine-2-5","machine-2-6","machine-2-7","machine-2-8","machine-2-9","machine-3-1","machine-3-2","machine-3-3","machine-3-4","machine-3-5","machine-3-6","machine-3-7","machine-3-8","machine-3-9","machine-3-10","machine-3-11"]
+    # f1_list = [0.9999]
+    # p_list = [0.9999]
+    # r_list = [0.9999]
+    # f1_list_1 = [0.9999]
+    # p_list_1 = [0.9999]
+    # r_list_1 = [0.9999]
+    # for i in SMD_machine:
+    #     result = main(i, 0.004)
+    #     f1_list.append(result[0]['best-f1']), p_list.append(result[0]['precision']), r_list.append(result[0]['recall'])
+    #     f1_list_1.append(result[1]['best-f1']), p_list_1.append(result[1]['precision']), r_list_1.append(result[1]['recall'])
         
-    for i in range(len(SMD_machine)):
-        print("%s f1 %f, pre %f, rec %f"%(i, f1_list[i+1], p_list[i+1], r_list[i+1]))
-    print("=============================")
-    for i in range(len(SMD_machine)):
-        print("%s f1_1 %f, pre %f, rec %f"%(i, f1_list_1[i+1], p_list_1[i+1], r_list_1[i+1]))
-    print("==========AVG RESULT=========")
-    print(np.mean(np.asarray(f1_list)), np.mean(np.asarray(p_list)), np.mean(np.asarray(r_list)))
-    print(np.mean(np.asarray(f1_list_1)), np.mean(np.asarray(p_list_1)), np.mean(np.asarray(r_list_1)))
+    # for i in range(len(SMD_machine)):
+    #     print("%s f1 %f, pre %f, rec %f"%(i, f1_list[i+1], p_list[i+1], r_list[i+1]))
+    # print("=============================")
+    # for i in range(len(SMD_machine)):
+    #     print("%s f1_1 %f, pre %f, rec %f"%(i, f1_list_1[i+1], p_list_1[i+1], r_list_1[i+1]))
+    # print("==========AVG RESULT=========")
+    # print(np.mean(np.asarray(f1_list)), np.mean(np.asarray(p_list)), np.mean(np.asarray(r_list)))
+    # print(np.mean(np.asarray(f1_list_1)), np.mean(np.asarray(p_list_1)), np.mean(np.asarray(r_list_1)))

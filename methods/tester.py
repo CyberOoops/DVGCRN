@@ -214,8 +214,8 @@ def main(i, j):
     parser.add_argument('--sample_path', type=str, default='gen_samples')
     args = parser.parse_args()
     
-    dataset_path = '../datas/{}data_processed/train/machine-{}-{}'.format(args.dataset, i, j)
-    log_path = 'log_trainer/%s'%args.dataset
+    dataset_path = '../datas/{}data_processed/test/machine-{}-{}'.format(args.dataset, i, j)
+    log_path = 'log_tester/%s'%args.dataset
     checkpoints_path = 'model/%s'%args.dataset
     
     assert len(args.z_dims) == len(args.h_dims)
