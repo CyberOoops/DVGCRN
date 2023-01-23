@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class Evaluator():
-    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-180, bf_search_max=10,
+    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-1800, bf_search_max=10,
                  bf_search_step_size=0.2, level=0.0030, log_path='', log_file=''):
         self.anomaly_score_label_file = anomaly_score_label_file
         self.score_idx = score_idx
@@ -389,7 +389,7 @@ def main(mac, level):
 
 
 if __name__ == '__main__':
-    result = main("swat", 0.004)
+    result = main("wadi", 0.004)
     for i in result:
         pprint(i)
     # SMD_machine = ["machine-1-2","machine-1-3","machine-1-4","machine-1-5","machine-1-6","machine-1-7","machine-1-8","machine-2-1","machine-2-2","machine-2-3","machine-2-4","machine-2-5","machine-2-6","machine-2-7","machine-2-8","machine-2-9","machine-3-1","machine-3-2","machine-3-3","machine-3-4","machine-3-5","machine-3-6","machine-3-7","machine-3-8","machine-3-9","machine-3-10","machine-3-11"]
