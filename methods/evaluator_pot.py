@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class Evaluator():
-    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-1800, bf_search_max=10,
+    def __init__(self, anomaly_score_label_file, score_idx=1, bf_search_min=-180, bf_search_max=10,
                  bf_search_step_size=0.2, level=0.0030, log_path='', log_file=''):
         self.anomaly_score_label_file = anomaly_score_label_file
         self.score_idx = score_idx
