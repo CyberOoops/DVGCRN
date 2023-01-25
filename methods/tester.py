@@ -204,7 +204,7 @@ def main(i, j):
     parser.add_argument('--h_dims', type=int, default=[20, 15, 10])
     parser.add_argument('--emb_dim', type=int, default=256)
     # Test
-    parser.add_argument('--start_epoch', type=int, default=50)
+    parser.add_argument('--start_epoch', type=int, default=160)
     # parser.add_argument('--checkpoints_path', type=str, default='model/machine-{}-{}'.format(i, j))
     parser.add_argument('--checkpoints_file', type=str, default='')
     parser.add_argument('--checkpoints_interval', type=int, default=5)
